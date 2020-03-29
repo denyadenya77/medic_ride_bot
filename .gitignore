@@ -1,2 +1,5 @@
 .env
 .idea/*
+bot_pack/.idea/*
+bot_pack/__pycache__/*
+
