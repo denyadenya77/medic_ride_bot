@@ -1,7 +1,6 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ConversationHandler
-
-from medic_ride_bot_run import GET_USER_STATUS, DRIVER, DOCTOR
+from vars_module import *
 
 
 def register(update, context):

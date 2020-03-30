@@ -1,14 +1,38 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ConversationHandler
-
-from medic_ride_bot_run import GET_START_POINT, GET_FINISH_POINT, GET_DEPARTURE_DATE, GET_DEPARTURE_TIME, \
-    GET_RIDE_STATUS, \
-    ONE_TIME, REGULAR
+from vars_module import *
 
 
-def add_one_time_ride(update, context):
+def add_ride(update, context):
     update.message.reply_text('Надішліть координати старту. \n51.6680, 32.6546')
-    return GET_START_POINT
+    return GET_RIDE_STATUS
+
+
+def get_ride_status(update, context):
+    query = update.callback_query
+    ride_type = query.data
+
+    # adding vars to user_data
+    if ride_type is ONE_TIME:
+        context.user_data['ride_type'] = 'ONE_TIME'
+    else:
+        context.user_data['ride_type'] = 'REGULAR'
+
+    # update.callback_query.answer()
+    # update.callback_query.edit_message_text(
+    #     f'Дякуємо! Ваша поїздка зереєстрована у системі. Ми повідомимо, коли знайдемо вам '
+    #     f'попутника\n'
+    #     f'Деталі:\n'
+    #     f'Координати відправлення: {context.user_data["start_latitude"]}, {context.user_data["start_longitude"]}.\n'
+    #     f'Координати призначення: {context.user_data["finish_latitude"]}, {context.user_data["finish_longitude"]}\n'
+    #     f'Дата відправлення: {context.user_data["date_of_departure"]}.\n'
+    #     f'Час выдправлення: {context.user_data["time_of_departure"]}.\n'
+    #     f'Тип поїдки: {context.user_data["ride_type"]}.')
+
+    update.callback_query.answer()
+    update.callback_query.edit_message_text(f'Тип вашої поїздки: {context.user_data["ride_type"]}')
+
+    return ConversationHandler.END
 
 
 def get_start_point(update, context):
@@ -62,24 +86,4 @@ def get_time_of_departure(update, context):
     return GET_RIDE_STATUS
 
 
-def get_ride_status(update, context):
-    query = update.callback_query
-    ride_type = query.data
 
-    # adding vars to user_data
-    if ride_type is ONE_TIME:
-        context.user_data['ride_type'] = 'ONE_TIME'
-    else:
-        context.user_data['ride_type'] = 'REGULAR'
-
-    update.callback_query.answer()
-    update.callback_query.edit_message_text(
-        f'Дякуємо! Ваша поїздка зереєстрована у системі. Ми повідомимо, коли знайдемо вам '
-        f'попутника\n'
-        f'Деталі:\n'
-        f'Координати відправлення: {context.user_data["start_latitude"]}, {context.user_data["start_longitude"]}.\n'
-        f'Координати призначення: {context.user_data["finish_latitude"]}, {context.user_data["finish_longitude"]}\n'
-        f'Дата відправлення: {context.user_data["date_of_departure"]}.\n'
-        f'Час выдправлення: {context.user_data["time_of_departure"]}.\n'
-        f'Тип поїдки: {context.user_data["ride_type"]}.')
-    return ConversationHandler.END

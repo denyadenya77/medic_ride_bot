@@ -3,18 +3,15 @@ from telegram.ext import ConversationHandler, Updater, CommandHandler, MessageHa
 import os
 from dotenv import load_dotenv
 
-from adding_ride_funcs import add_one_time_ride, get_start_point, get_finish_point, get_date_of_departure, \
-    get_time_of_departure, get_ride_status
+# from adding_ride_funcs import add_ride, get_start_point, get_finish_point, get_date_of_departure, \
+#     get_time_of_departure, get_ride_status
+from adding_ride_funcs_2 import add_ride, get_ride_status, get_departure_time, get_departure_date, \
+    get_ride_type_or_start_point, get_finish_point_and_send_requests
 from other_funcs import start, cancel
 from register_funcs import register, get_user_status
+from vars_module import *
 
 load_dotenv()
-
-
-GET_USER_STATUS, GET_START_POINT, GET_FINISH_POINT, GET_DEPARTURE_DATE, GET_DEPARTURE_TIME, \
- GET_RIDE_STATUS = map(chr, range(6))
-DRIVER, DOCTOR = map(chr, range(6, 8))
-ONE_TIME, REGULAR = map(chr, range(8, 10))
 
 
 def main():
@@ -25,14 +22,19 @@ def main():
 
     conv_handler = ConversationHandler(
         entry_points=[CommandHandler('register', register),
-                      CommandHandler('add_one_time_ride', add_one_time_ride)],
+                      CommandHandler('add_ride', add_ride)],
         states={
             GET_USER_STATUS: [CallbackQueryHandler(get_user_status, pattern=f'^{str(DRIVER)}$|^{str(DOCTOR)}$')],
-            GET_START_POINT: [MessageHandler(Filters.text, get_start_point, pass_user_data=True)],
-            GET_FINISH_POINT: [MessageHandler(Filters.text, get_finish_point, pass_user_data=True)],
-            GET_DEPARTURE_DATE: [MessageHandler(Filters.text, get_date_of_departure, pass_user_data=True)],
-            GET_DEPARTURE_TIME: [MessageHandler(Filters.text, get_time_of_departure, pass_user_data=True)],
-            GET_RIDE_STATUS: [CallbackQueryHandler(get_ride_status, pattern=f'^{str(ONE_TIME)}$|^{str(REGULAR)}$')]
+            GET_RIDE_STATUS: [CallbackQueryHandler(get_ride_status, pattern=f'^{str(ONE_TIME)}$|^{str(REGULAR)}$')],
+            GET_DEPARTURE_TIME: [MessageHandler(Filters.text, get_departure_time, pass_user_data=True)],
+            GET_DEPARTURE_DATE: [MessageHandler(Filters.text, get_departure_date, pass_user_data=True)],
+            GET_START_POINT: [MessageHandler(Filters.text, get_ride_type_or_start_point, pass_user_data=True)],
+            GET_FINISH_POINT: [MessageHandler(Filters.text, get_finish_point_and_send_requests, pass_user_data=True)]
+
+            # GET_DEPARTURE_TIME: [MessageHandler(Filters.text, get_time_of_departure, pass_user_data=True)],
+            # GET_DEPARTURE_DATE: [MessageHandler(Filters.text, get_date_of_departure, pass_user_data=True)],
+            # GET_START_POINT: [MessageHandler(Filters.text, get_start_point, pass_user_data=True)],
+            # GET_FINISH_POINT: [MessageHandler(Filters.text, get_finish_point, pass_user_data=True)],
         },
         fallbacks=[CommandHandler('cancel', cancel)],
     )
