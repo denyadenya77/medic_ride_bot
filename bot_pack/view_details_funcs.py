@@ -13,8 +13,8 @@ def get_details(update, context):
 
         context.chat_data['info']['count_of_active_messages'] += 1
 
-        keyboard = [[InlineKeyboardButton("Переглянути пункт призначення", callback_data=str(VIEW))],
-                    [InlineKeyboardButton("Зв'язатися з медиком", callback_data=str(CHAT))],
+        keyboard = [[InlineKeyboardButton("Переглянути пункт призначення", callback_data=f'{str(VIEW)}{key}')],
+                    [InlineKeyboardButton("Зв'язатися з медиком", callback_data=f'{str(CHAT)}{key}')],
                     [InlineKeyboardButton("Цей маршрут мені не підходить", callback_data=str(NO))]]
         reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -32,11 +32,12 @@ def get_details(update, context):
 
 def view_finish_point(update, context):
 
-    message_data_index = int(update.effective_message.text[0])
+    # message_data_index = int(update.effective_message.text[0])
+    message_data_index = int(update.effective_message.reply_markup.inline_keyboard[0][0].callback_data[-1])
     message_data = get_concrete_message_data(message_data_index, context)
 
-    keyboard = [[InlineKeyboardButton("Зв'язатися з медиком", callback_data=str(CHAT))],
-                [InlineKeyboardButton("Назад", callback_data=str(BACK_BUTTON))],
+    keyboard = [[InlineKeyboardButton("Зв'язатися з медиком", callback_data=f'{str(CHAT)}{str(message_data_index)}')],
+                [InlineKeyboardButton("Назад", callback_data=f'{str(BACK_BUTTON)}{str(message_data_index)}')],
                 [InlineKeyboardButton("Цей маршрут мені не підходить", callback_data=str(NO))]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
@@ -48,11 +49,12 @@ def view_finish_point(update, context):
 
 
 def get_chat(update, context):
-    message_data_index = int(update.effective_message.text[0])
+    # message_data_index = int(update.effective_message.text[0])
+    message_data_index = int(update.effective_message.reply_markup.inline_keyboard[0][0].callback_data[-1])
     message_data = get_concrete_message_data(message_data_index, context)
 
-    keyboard = [[InlineKeyboardButton("Переглянути пункт призначення", callback_data=str(VIEW))],
-                [InlineKeyboardButton("Назад", callback_data=str(BACK_BUTTON))]]
+    keyboard = [[InlineKeyboardButton("Переглянути пункт призначення", callback_data=f'{str(VIEW)}{str(message_data_index)}')],
+                [InlineKeyboardButton("Назад", callback_data=f'{str(BACK_BUTTON)}{str(message_data_index)}')]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     text = f'{str(message_data_index)}.\n' \
@@ -69,15 +71,16 @@ def get_back_mock(update, context):
     get_details - глупо. В добавок может возникнуть конфлик двух CallbackQueryHandler: один будет в entry_points,
     а дургой в states.
     """
-    message_data_index = int(update.effective_message.text[0])
+    # message_data_index = int(update.effective_message.text[0])
+    message_data_index = int(update.effective_message.reply_markup.inline_keyboard[0][0].callback_data[-1])
     message_data = get_concrete_message_data(message_data_index, context)
 
-    keyboard = [[InlineKeyboardButton("Переглянути пункт призначення", callback_data=str(VIEW))],
-                [InlineKeyboardButton("Зв'язатися з медиком", callback_data=str(CHAT))],
+    keyboard = [[InlineKeyboardButton("Переглянути пункт призначення", callback_data=f'{str(VIEW)}{str(message_data_index)}')],
+                [InlineKeyboardButton("Зв'язатися з медиком", callback_data=f'{str(CHAT)}{str(message_data_index)}')],
                 [InlineKeyboardButton("Цей маршрут мені не підходить", callback_data=str(NO))]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    text = f'{message_data_index}.\n' \
+    text = f'{str(message_data_index)}.\n' \
            f'Час відправлення: {message_data["time_of_departure"]}\n' \
            f'Дата відправлення: {message_data["date_of_departure"]}'
 
@@ -96,7 +99,7 @@ def end_viewing(update, context):
         context.chat_data['info']['count_of_active_messages'] -= 1
         return SELECTING_DETAILS_ACTION
 
-    
+
 def get_concrete_message_data(message_data_index, context):
     message_data = {}
     for key, value in context.user_data['response']['result_list'].items():

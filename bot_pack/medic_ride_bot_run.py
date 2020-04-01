@@ -35,13 +35,14 @@ def main():
             GET_FINISH_POINT: [MessageHandler(Filters.text, get_finish_point_and_send_requests, pass_user_data=True)],
             # ниже - conversation для получения инфы о совпадении
             GET_RESULT_LIST: [CallbackQueryHandler(get_details, pattern=f'^{str(GET_DETAILS)}$', pass_user_data=True)],
-            SELECTING_DETAILS_ACTION: [CallbackQueryHandler(view_finish_point, pattern=f'^{str(VIEW)}$', pass_user_data=True),
-                                       CallbackQueryHandler(get_chat, pattern=f'^{str(CHAT)}$', pass_user_data=True),
-                                       CallbackQueryHandler(get_back_mock, pattern=f'^{str(BACK_BUTTON)}$', pass_user_data=True),
-                                       CallbackQueryHandler(end_viewing, pattern=f'^{str(NO)}$'),
-                                       # CallbackQueryHandler(not_ended_action, pattern=f'^/register|/add_ride$')],
-                                       MessageHandler(Filters.regex(r'^/register|/add_ride$'), not_ended_action)
-                                       ],
+            SELECTING_DETAILS_ACTION: [
+                CallbackQueryHandler(view_finish_point, pattern=f'^{str(VIEW)}\w+$', pass_user_data=True),
+                CallbackQueryHandler(get_chat, pattern=f'^{str(CHAT)}\w+$', pass_user_data=True),
+                CallbackQueryHandler(get_back_mock, pattern=f'^{str(BACK_BUTTON)}\w+$', pass_user_data=True),
+                CallbackQueryHandler(end_viewing, pattern=f'^{str(NO)}$'),
+                # CallbackQueryHandler(not_ended_action, pattern=f'^/register|/add_ride$')],
+                MessageHandler(Filters.regex(r'^/register|/add_ride$'), not_ended_action)
+                ],
         },
         fallbacks=[CommandHandler('cancel', cancel)],
     )
