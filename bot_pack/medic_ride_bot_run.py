@@ -40,7 +40,8 @@ def main():
                                        CallbackQueryHandler(get_back_mock, pattern=f'^{str(BACK_BUTTON)}$', pass_user_data=True),
                                        CallbackQueryHandler(end_viewing, pattern=f'^{str(NO)}$'),
                                        # CallbackQueryHandler(not_ended_action, pattern=f'^/register|/add_ride$')],
-                                       MessageHandler(Filters.text, not_ended_action, pattern=f'^/register|/add_ride$')],
+                                       MessageHandler(Filters.regex(r'^/register|/add_ride$'), not_ended_action)
+                                       ],
         },
         fallbacks=[CommandHandler('cancel', cancel)],
     )

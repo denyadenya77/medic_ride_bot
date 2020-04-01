@@ -109,22 +109,22 @@ def get_finish_point_and_send_requests(update, context):
 
 def get_db_response(update, context):
 
-    dummy_data = {'result_list': [
-        {
+    dummy_data = {'result_list': {
+        1: {
             'user_status': 'medic',
             'user_chat_id': '0000000',
             'time_of_departure': '08.00',
             'date_of_departure': '20.20.2020',
             'finish_point': 'location_object'
         },
-        {
+        2: {
             'user_status': 'medic',
             'user_chat_id': '11111111',
             'time_of_departure': '21.00',
             'date_of_departure': '20.20.3333',
             'finish_point': 'location_object++++++'
         }
-    ]}
+    }}
 
     # отправляем запрос на наличие совпадений -- GET
     response = dummy_data
@@ -134,7 +134,7 @@ def get_db_response(update, context):
     context.user_data['response'] = response
 
     if len(context.user_data['response']['result_list']):
-        if context.user_data['response']['result_list'][0]['user_status'] is 'medic':
+        if context.user_data['response']['result_list'][1]['user_status'] is 'medic':
             keyboard = [[InlineKeyboardButton("Деталі", callback_data=str(GET_DETAILS))]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             update.message.reply_text('Ми знайшли медиків поряд з місцем вашого відправлення!',
