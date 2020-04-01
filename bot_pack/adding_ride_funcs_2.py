@@ -104,7 +104,7 @@ def get_finish_point_and_send_requests(update, context):
 
     # отправляем собраные данные -- POST
     # вызываем метод для получения -- GET
-    get_db_response(update, context)
+    return get_db_response(update, context)
 
 
 def get_db_response(update, context):
@@ -116,28 +116,40 @@ def get_db_response(update, context):
             'time_of_departure': '08.00',
             'date_of_departure': '20.20.2020',
             'finish_point': 'location_object'
+        },
+        {
+            'user_status': 'medic',
+            'user_chat_id': '11111111',
+            'time_of_departure': '21.00',
+            'date_of_departure': '20.20.3333',
+            'finish_point': 'location_object++++++'
         }
     ]}
 
     # отправляем запрос на наличие совпадений -- GET
     response = dummy_data
 
-    # после отправки запроса сбрасываем содержимое user_data, чтобы поместить в словарь данные из GET
+    # после отправки запроса перезаписываем содержимое user_data, чтобы передать их в get_details
     context.user_data.clear()
+    context.user_data['response'] = response
 
-    if len(response['result_list']):
-        if response['result_list'][0]['user_status'] is 'medic':
+    if len(context.user_data['response']['result_list']):
+        if context.user_data['response']['result_list'][0]['user_status'] is 'medic':
             keyboard = [[InlineKeyboardButton("Деталі", callback_data=str(GET_DETAILS))]]
             reply_markup = InlineKeyboardMarkup(keyboard)
-            update.message.reply_text('Ми знайшли медиків поряд з місцем вашого відправлення!', reply_markup=reply_markup)
+            update.message.reply_text('Ми знайшли медиків поряд з місцем вашого відправлення!',
+                                      reply_markup=reply_markup)
+            return GET_RESULT_LIST
         else:
             update.message.reply_text("Поряд з місцем вашого відправлення знайшлися водії!\n"
                                       "Ми відправили їм ваши контакти, та інформацію про ваш маршрут.\n"
                                       "Можливо скоро з вами зв'яжуться!")
+            return ConversationHandler.END
     else:
         update.message.reply_text('Наразі у систумі немає ваших попутників. Ми повідомимо, коли такі знайдуться.')
+        return ConversationHandler.END
 
-    return ConversationHandler.END
+
 
 
 
