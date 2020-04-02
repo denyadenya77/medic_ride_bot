@@ -5,5 +5,4 @@ ONE_TIME, REGULAR = map(chr, range(8, 10))
 GET_DETAILS = chr(10)
 
 # состояния для работы с совпадениями
-SELECTING_DETAILS_ACTION = chr(11)
-VIEW, CHAT, BACK_BUTTON, NO, GET_RESULT_LIST = map(chr, range(12, 17))
+GET_RESULT_LIST = chr(11)

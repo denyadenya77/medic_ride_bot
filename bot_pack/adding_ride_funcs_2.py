@@ -13,9 +13,13 @@ def add_ride(update, context):
     return GET_RIDE_STATUS
 
 
-def get_ride_status(update, context):
+def get_ride_status_and_user_id(update, context):
     query = update.callback_query
     ride_type = query.data
+
+    # saving user data
+    context.user_data['user_first_name'] = update.effective_user.first_name
+    context.user_data['user_last_name'] = update.effective_user.last_name
 
     if ride_type is ONE_TIME:
         context.user_data['ride_type'] = 'ONE_TIME'
@@ -57,19 +61,24 @@ def get_departure_date(update, context):
 
 def get_ride_type_or_start_point(update, context):
     if update.callback_query:
-
         query = update.callback_query
         ride_type = query.data
-
         # adding vars to user_data
         if ride_type is ONE_TIME:
             context.user_data['ride_type'] = 'ONE_TIME'
         else:
             context.user_data['ride_type'] = 'REGULAR'
-
         text = f'Тип вашої поїздки: {context.user_data["ride_type"]}'
+        context.bot.send_message(chat_id=update.effective_message.chat_id, text=text)
     else:
-        latitude, longitude = update.message.text.split(', ')
+        if update.message.text:
+            latitude, longitude = update.message.text.split(', ')
+            user_location = Location(longitude=longitude, latitude=latitude)
+        # тут пытаемся принять объект геолокации
+        else:
+            location = update.message.location
+            latitude, longitude = location.latitude, location.longitude
+            user_location = Location(longitude=longitude, latitude=latitude)
 
         # adding vars to user_data
         context.user_data['start_latitude'] = latitude
@@ -77,8 +86,10 @@ def get_ride_type_or_start_point(update, context):
 
         text = f'Координати місця вашого відправлення: {context.user_data["start_latitude"]}, ' \
                f'{context.user_data["start_longitude"]}'
+        context.bot.send_message(chat_id=update.effective_message.chat_id, text=text)
+        context.bot.send_location(chat_id=update.effective_message.chat_id, location=user_location)
 
-    update.message.reply_text('А тепер вкажіть, куди ви прямуєте:')
+    context.bot.send_message(chat_id=update.effective_message.chat_id, text='А тепер вкажіть, куди ви прямуєте:')
     return GET_FINISH_POINT
 
 
@@ -111,18 +122,30 @@ def get_db_response(update, context):
 
     dummy_data = {'result_list': {
         1: {
+            'user_first_name': 'Denis',
+            'user_last_name': 'Kuznetsov',
+            'user_phone_number': '+380997683348',
             'user_status': 'medic',
-            'user_chat_id': '0000000',
+            'user_chat_id': '400427515',
             'time_of_departure': '08.00',
             'date_of_departure': '20.20.2020',
-            'finish_point': 'location_object'
+            'finish_point': {
+                'latitude': '47.8154243',
+                'longitude': '35.1920189'
+            }
         },
         2: {
+            'user_first_name': 'Some',
+            'user_last_name': 'User',
+            'user_phone_number': '+380997683348',
             'user_status': 'medic',
-            'user_chat_id': '11111111',
+            'user_chat_id': '400427515',
             'time_of_departure': '21.00',
             'date_of_departure': '20.20.3333',
-            'finish_point': 'location_object++++++'
+            'finish_point': {
+                'latitude': '47.8516381',
+                'longitude': '35.1303422'
+            }
         }
     }}
 
